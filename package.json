@@ -1,0 +1,10 @@
+{
+  "name": "hangwell",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Put in your frame sizes and the wall and it tells you the exact nail height off the floor, spaces a row of frames evenly, and says what fixing the wall needs. Runs in the browser, nothing uploaded. With Tack the thumbtack.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
