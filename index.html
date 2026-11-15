@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hangwell — where to put the nail</title>
+<meta name="description" content="Tell it your frame sizes and the wall and it works out the exact nail height off the floor, spaces a row of frames evenly, and says what fixing the wall needs. Runs in your browser, nothing uploaded.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23b4603f'/><rect x='16' y='14' width='32' height='26' rx='2' fill='%23f3ece1'/><rect x='20' y='18' width='24' height='18' rx='1' fill='%23cdbfa8'/><circle cx='32' cy='12' r='4' fill='%23f3ece1'/><rect x='30.5' y='12' width='3' height='9' fill='%23f3ece1'/></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="intro">
+    <h1>Hangwell</h1>
+    <p class="lede">Put in your frame sizes and the wall, and it tells you the exact nail height off the floor, spaces a row evenly, and says what fixing the wall needs. With a drawing of where every nail goes.</p>
+  </header>
+
+  <section class="panel" aria-label="Your wall">
+    <div class="grid">
+      <label class="field">Units
+        <select id="unit">
+          <option value="cm">Centimetres</option>
+          <option value="in">Inches</option>
+        </select>
+      </label>
+
+      <label class="field">Wall width
+        <span class="with-unit"><input type="number" id="wall" min="0" step="1" inputmode="decimal" value="150"><span class="unit">cm</span></span>
+      </label>
+
+      <label class="field">Eye level (picture centre)
+        <span class="with-unit"><input type="number" id="eye" min="0" step="1" inputmode="decimal" value="145"><span class="unit">cm</span></span>
+      </label>
+
+      <label class="field">Wire drop below the top
+        <span class="with-unit"><input type="number" id="drop" min="0" step="0.5" inputmode="decimal" value="5"><span class="unit">cm</span></span>
+      </label>
+
+      <label class="field">Wall type
+        <select id="walltype">
+          <option value="plasterboard">Plasterboard (hollow)</option>
+          <option value="masonry">Brick or block</option>
+          <option value="stud">Into a stud</option>
+        </select>
+      </label>
+
+      <label class="field" id="gap-wrap" style="display:none">Gap between frames
+        <span class="with-unit"><input type="number" id="gap" min="0" step="1" inputmode="decimal" value="10"><span class="unit">cm</span></span>
+      </label>
+    </div>
+
+    <div class="frames-head">
+      <h2>Frames</h2>
+      <button type="button" id="add" class="btn btn--small">+ Add frame</button>
+    </div>
+    <div id="frames" class="frames"></div>
+
+    <div class="actions">
+      <button type="button" id="share" class="btn">Share link</button>
+      <button type="button" id="clear" class="btn btn--quiet">Clear</button>
+    </div>
+  </section>
+
+  <div id="preview" class="preview" aria-hidden="false"></div>
+
+  <section id="out" class="out" aria-live="polite" aria-label="Your plan"></section>
+
+  <section class="notes">
+    <h2>How it works</h2>
+    <p>Galleries hang art so the <strong>middle of the picture sits at eye level</strong>, about 145 cm (57 inches) off the floor, whatever the size. The catch is the nail: the wire or hook sits a little below the top of the frame and lifts it, so the nail goes <em>above</em> the middle by half the frame height minus the wire drop. Hangwell does that sum, so you mark the nail straight off the floor.</p>
+    <p>For a <strong>row of frames</strong>, line them up by their middles, not their tops, so different sizes still read as a set. Hangwell puts every frame's middle on the eye-level line (so the nails land at different heights) and spreads the row across the wall with <strong>equal gaps and equal space at the ends</strong>. If the frames are wider than the wall, it says so instead of running them off the edge.</p>
+    <p>A <strong>wide or heavy frame</strong> hangs straighter on two hooks, a quarter of the way in from each edge, so it can't tip and is easy to level. And the <strong>fixing</strong> depends on the wall: a light frame hangs on a hardened picture hook, but plasterboard needs a proper toggle for anything heavier, and a stud or brick holds far more. The 57-inch centre is common museum practice; fixing weights follow the usual trade bands — always check the pack's own rating.</p>
+    <p class="fineprint">Hangwell is a guide for hanging pictures, not a structural calculation. For something very heavy, a mirror or a TV, use fixings rated for the weight and find the studs or use the right masonry anchors. Nothing you type leaves your device.</p>
+  </section>
+</main>
+
+<button id="tack" class="tack" aria-label="Tack the thumbtack — tap for a tip">
+  <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+    <circle cx="32" cy="34" r="20" fill="#d98b5f"/>
+    <circle cx="32" cy="34" r="20" fill="none" stroke="#b4603f" stroke-width="2"/>
+    <rect x="30" y="2" width="4" height="16" rx="2" fill="#8a8f98"/>
+    <circle cx="27" cy="31" r="3" fill="#3a2a22"/>
+    <circle cx="37" cy="31" r="3" fill="#3a2a22"/>
+    <path id="tack-mouth" d="M 24 41 Q 32 47 40 41" fill="none" stroke="#3a2a22" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="tack-bubble" class="tack-bubble" role="status" aria-live="polite"></div>
+
+<script src="src/core.js"></script>
+<script src="src/tack.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
