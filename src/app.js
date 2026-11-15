@@ -87,7 +87,6 @@
       wallWidth: H.toCm(parseFloat(wallEl.value) || 0, unit),
       eyeLevel: H.toCm(parseFloat(eyeEl.value) || 0, unit),
       wireDrop: H.toCm(parseFloat(dropEl.value) || 0, unit),
-      gap: 0,
       wall: wallTypeEl.value
     };
   }
@@ -212,7 +211,7 @@
       summary = '<strong>' + plan.frames.length + ' frames</strong> across a <strong>' + show(settings.wallWidth) + ' ' + unit +
         '</strong> wall, ' + (plan.overflow
           ? 'but they’re <strong>wider than the wall</strong> as set — shrink the gap or drop one.'
-          : 'centred with <strong>' + show(settings.gap != null ? plan.gap : 0) + ' ' + unit + '</strong> gaps and <strong>' + show(plan.sideMargin) + ' ' + unit + '</strong> each end.');
+          : 'centred with <strong>' + show(plan.gap) + ' ' + unit + '</strong> gaps and <strong>' + show(plan.sideMargin) + ' ' + unit + '</strong> each end.');
     }
 
     var list = plan.frames.map(frameLine).join("");
