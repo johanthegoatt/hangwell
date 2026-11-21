@@ -116,3 +116,32 @@ test("masonry and a found stud hold more than bare plasterboard", () => {
   assert.strictEqual(H.fixing({ weight: 15, wall: "stud" }).level, "ok");
   assert.strictEqual(H.fixing({ weight: 15, wall: "plasterboard" }).level, "watch");
 });
+
+test("nailHeight reports a drop from the ceiling when a ceiling height is given", () => {
+  // 50 cm frame, default 145 cm eye level, default wire drop.
+  const r = H.nailHeight({ frameHeight: 50, ceilingHeight: 240 });
+  assert.ok(r.nail > 0);
+  assert.ok(Math.abs(r.nailFromCeiling - (240 - r.nail)) < 1e-9);
+  assert.ok(Math.abs(r.topFromCeiling - (240 - r.topOfFrame)) < 1e-9);
+});
+
+test("no ceiling height leaves the drop-from-ceiling null", () => {
+  const r = H.nailHeight({ frameHeight: 50 });
+  assert.strictEqual(r.nailFromCeiling, null);
+  assert.strictEqual(r.ceilingHeight, null);
+  assert.strictEqual(r.topFromCeiling, null);
+});
+
+test("a ceiling lower than the nail is ignored rather than going negative", () => {
+  const r = H.nailHeight({ frameHeight: 50, ceilingHeight: 100 }); // nail ~165 cm > 100
+  assert.strictEqual(r.nailFromCeiling, null);
+});
+
+test("rowPlan passes the ceiling drop onto each frame", () => {
+  const r = H.rowPlan({ wallWidth: 200, gap: 10, ceilingHeight: 240, frames: [{ width: 40, height: 50 }, { width: 30, height: 40 }] });
+  assert.strictEqual(r.frames.length, 2);
+  r.frames.forEach((f) => {
+    assert.ok(f.nailFromCeiling != null);
+    assert.ok(Math.abs(f.nailFromCeiling - (240 - f.nailHeight)) < 1e-9);
+  });
+});
