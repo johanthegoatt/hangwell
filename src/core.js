@@ -63,12 +63,27 @@
 
     var topOfFrame = eyeLevel + frameHeight / 2;
     var nail = topOfFrame - wireDrop;
+
+    // Most people hold the tape at the ceiling (or a picture rail) and measure
+    // down, not up from a skirting board that may not be level, so when a
+    // ceiling height is given, report the nail as a drop from it too. That's the
+    // ceiling height minus the nail height off the floor.
+    var ceiling = Number(opts.ceilingHeight);
+    var nailFromCeiling = null, topFromCeiling = null;
+    if (isFinite(ceiling) && ceiling > nail) {
+      nailFromCeiling = round(ceiling - nail, 1);
+      topFromCeiling = round(ceiling - topOfFrame, 1);
+    }
+
     return {
       centre: round(eyeLevel, 1),
       topOfFrame: round(topOfFrame, 1),
       bottomOfFrame: round(eyeLevel - frameHeight / 2, 1),
       nail: round(nail, 1),
-      wireDrop: wireDrop
+      wireDrop: wireDrop,
+      ceilingHeight: isFinite(ceiling) && ceiling > 0 ? round(ceiling, 1) : null,
+      nailFromCeiling: nailFromCeiling,
+      topFromCeiling: topFromCeiling
     };
   }
 
@@ -82,6 +97,7 @@
     var gap = Math.max(0, Number(opts.gap) || 0);
     var eyeLevel = isFinite(Number(opts.eyeLevel)) ? Number(opts.eyeLevel) : EYE_LEVEL_CM;
     var wireDrop = isFinite(Number(opts.wireDrop)) ? Number(opts.wireDrop) : WIRE_DROP_CM;
+    var ceilingHeight = Number(opts.ceilingHeight);
 
     var frames = (opts.frames || []).map(function (f) {
       return {
@@ -107,7 +123,7 @@
     var placed = frames.map(function (f) {
       var left = x;
       var centreX = left + f.width / 2;
-      var nh = nailHeight({ frameHeight: f.height, eyeLevel: eyeLevel, wireDrop: wireDrop });
+      var nh = nailHeight({ frameHeight: f.height, eyeLevel: eyeLevel, wireDrop: wireDrop, ceilingHeight: ceilingHeight });
       var twoHooks = f.width >= TWO_HOOK_WIDTH_CM || f.weight >= 10;
       var hooks = twoHooks
         // Two hooks sit a quarter of the width in from each edge, so the frame
@@ -123,6 +139,7 @@
         right: round(left + f.width, 1),
         centreX: round(centreX, 1),
         nailHeight: nh.nail,
+        nailFromCeiling: nh.nailFromCeiling,
         topOfFrame: nh.topOfFrame,
         bottomOfFrame: nh.bottomOfFrame,
         hooks: hooks,
