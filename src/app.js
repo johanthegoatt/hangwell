@@ -10,7 +10,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var SVGNS = "http://www.w3.org/2000/svg";
 
-  var unitEl = $("unit"), wallEl = $("wall"), eyeEl = $("eye"), dropEl = $("drop"), wallTypeEl = $("walltype");
+  var unitEl = $("unit"), wallEl = $("wall"), eyeEl = $("eye"), dropEl = $("drop"), wallTypeEl = $("walltype"), ceilEl = $("ceil");
   var framesEl = $("frames"), addEl = $("add"), out = $("out"), preview = $("preview");
 
   var unit = "cm";
@@ -87,6 +87,7 @@
       wallWidth: H.toCm(parseFloat(wallEl.value) || 0, unit),
       eyeLevel: H.toCm(parseFloat(eyeEl.value) || 0, unit),
       wireDrop: H.toCm(parseFloat(dropEl.value) || 0, unit),
+      ceilingHeight: ceilEl && ceilEl.value !== "" ? H.toCm(parseFloat(ceilEl.value) || 0, unit) : 0,
       wall: wallTypeEl.value
     };
   }
@@ -168,6 +169,7 @@
       '<span class="plan-size">' + show(f.width) + ' &times; ' + show(f.height) + ' ' + unit + (f.weight ? ', ' + f.weight + ' kg' : '') + '</span></div>' +
       '<div class="plan-body">' +
         '<p class="plan-nail"><strong>Nail ' + show(f.nailHeight) + ' ' + unit + '</strong> off the floor' +
+          (f.nailFromCeiling != null ? ' (or ' + show(f.nailFromCeiling) + ' ' + unit + ' down from the ceiling)' : '') +
           (f.twoHooks ? ', two hooks at ' + hooks + ' across the wall' : ', at ' + hooks + ' across the wall') + '.</p>' +
         '<p class="plan-fix"><span class="fix-tag">' + fx.fitting + '</span> ' + fx.detail + '</p>' +
       '</div></li>';
@@ -184,6 +186,7 @@
       gap: framesCm.length > 1 ? gap : 0,
       eyeLevel: settings.eyeLevel,
       wireDrop: settings.wireDrop,
+      ceilingHeight: settings.ceilingHeight,
       frames: framesCm
     });
 
@@ -206,7 +209,8 @@
     if (plan.frames.length === 1) {
       var f0 = plan.frames[0];
       summary = 'Hang the middle of the picture at <strong>' + show(settings.eyeLevel) + ' ' + unit +
-        '</strong>, so the nail goes <strong>' + show(f0.nailHeight) + ' ' + unit + '</strong> off the floor.';
+        '</strong>, so the nail goes <strong>' + show(f0.nailHeight) + ' ' + unit + '</strong> off the floor' +
+        (f0.nailFromCeiling != null ? ', or <strong>' + show(f0.nailFromCeiling) + ' ' + unit + '</strong> down from the ceiling' : '') + '.';
     } else {
       summary = '<strong>' + plan.frames.length + ' frames</strong> across a <strong>' + show(settings.wallWidth) + ' ' + unit +
         '</strong> wall, ' + (plan.overflow
@@ -235,6 +239,7 @@
     q.set("wall", wallEl.value);
     q.set("eye", eyeEl.value);
     q.set("drop", dropEl.value);
+    if (ceilEl && ceilEl.value !== "") q.set("ceil", ceilEl.value);
     q.set("wt", wallTypeEl.value);
     if (rows.length > 1) q.set("gap", $("gap").value);
     var fr = [];
@@ -252,6 +257,7 @@
     if (q.has("wall")) wallEl.value = q.get("wall");
     if (q.has("eye")) eyeEl.value = q.get("eye");
     if (q.has("drop")) dropEl.value = q.get("drop");
+    if (q.has("ceil") && ceilEl) ceilEl.value = q.get("ceil");
     if (q.has("wt")) wallTypeEl.value = q.get("wt");
     if (q.has("gap")) $("gap").value = q.get("gap");
     var f = q.get("f");
@@ -278,6 +284,7 @@
     conv(wallEl, to === "in" ? 1 : 0);
     conv(eyeEl, to === "in" ? 1 : 0);
     conv(dropEl, to === "in" ? 2 : 1);
+    if (ceilEl && ceilEl.value !== "") conv(ceilEl, to === "in" ? 1 : 0);
     conv($("gap"), to === "in" ? 1 : 0);
     framesEl.querySelectorAll(".frow").forEach(function (row) {
       conv(row.querySelector(".f-w"), to === "in" ? 1 : 0);
@@ -296,7 +303,7 @@
 
   unitEl.addEventListener("change", function () { switchUnit(unitEl.value); });
   addEl.addEventListener("click", function () { addFrame(); render(); });
-  [wallEl, eyeEl, dropEl, wallTypeEl, $("gap")].forEach(function (el) {
+  [wallEl, eyeEl, dropEl, wallTypeEl, ceilEl, $("gap")].forEach(function (el) {
     el.addEventListener("input", render);
     el.addEventListener("change", render);
   });
