@@ -219,10 +219,34 @@
     }
 
     var list = plan.frames.map(frameLine).join("");
+
+    // Over-furniture note: when a single frame is being hung above a sofa or
+    // console, the furniture, not eye level, sets the height.
+    var furnHtml = "";
+    var furnTop = H.toCm(parseFloat($("furn").value) || 0, unit);
+    if (plan.frames.length === 1 && furnTop > 0) {
+      var fh = plan.frames[0];
+      var af = H.aboveFurniture({
+        furnitureTop: furnTop,
+        frameHeight: fh.height,
+        wireDrop: settings.wireDrop,
+        furnitureWidth: H.toCm(parseFloat($("furnw").value) || 0, unit)
+      });
+      if (af) {
+        furnHtml = '<div class="furn-note"><strong>Over the furniture:</strong> leave ' + show(af.gap) + ' ' + unit +
+          ' of wall above it, so the nail goes <strong>' + show(af.nail) + ' ' + unit + '</strong> off the floor' +
+          ' (middle at ' + show(af.centre) + ' ' + unit + ', about ' + show(Math.abs(af.aboveEyeLevel)) + ' ' + unit +
+          ' ' + (af.aboveEyeLevel >= 0 ? 'above' : 'below') + ' plain eye level).' +
+          (af.artWidthMin ? ' Art around ' + show(af.artWidthMin) + '–' + show(af.artWidthMax) + ' ' + unit + ' wide sits best over a ' + show(af.furnitureWidth) + ' ' + unit + ' piece.' : '') +
+          '</div>';
+      }
+    }
+
     out.innerHTML =
       '<p class="built">' + summary + '</p>' +
       (plan.overflow ? '<p class="warn">The frames and gaps add up to ' + show(plan.groupWidth) + ' ' + unit + ', more than the ' + show(plan.wallWidth) + ' ' + unit + ' wall.</p>' : '') +
-      '<ul class="planlist">' + list + '</ul>';
+      '<ul class="planlist">' + list + '</ul>' +
+      furnHtml;
 
     if (window.Tack) Tack.context({
       count: plan.frames.length,
@@ -303,7 +327,7 @@
 
   unitEl.addEventListener("change", function () { switchUnit(unitEl.value); });
   addEl.addEventListener("click", function () { addFrame(); render(); });
-  [wallEl, eyeEl, dropEl, wallTypeEl, ceilEl, $("gap")].forEach(function (el) {
+  [wallEl, eyeEl, dropEl, wallTypeEl, ceilEl, $("gap"), $("furn"), $("furnw")].forEach(function (el) {
     el.addEventListener("input", render);
     el.addEventListener("change", render);
   });

@@ -136,3 +136,9 @@ select:focus-visible, input:focus-visible, .btn:focus-visible, .tack:focus-visib
   .frow { grid-template-columns: 1.2em 1fr 1fr; grid-row-gap: 8px; }
   .frow-x { grid-column: 3; grid-row: 1; justify-self: end; }
 }
+
+/* Over-furniture hanging note. */
+.furn-note {
+  margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--accent-soft, var(--card)); line-height: 1.5; font-size: .92rem;
+}
