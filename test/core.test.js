@@ -145,3 +145,35 @@ test("rowPlan passes the ceiling drop onto each frame", () => {
     assert.ok(Math.abs(f.nailFromCeiling - (240 - f.nailHeight)) < 1e-9);
   });
 });
+
+test("aboveFurniture: nail height builds up from the furniture top", () => {
+  // Sofa top 85 cm, 18 cm gap, 50 cm frame, 5 cm wire drop.
+  const r = H.aboveFurniture({ furnitureTop: 85, gap: 18, frameHeight: 50, wireDrop: 5 });
+  assert.strictEqual(r.bottomOfFrame, 103);   // 85 + 18
+  assert.strictEqual(r.topOfFrame, 153);      // + 50
+  assert.strictEqual(r.centre, 128);          // bottom + 25
+  assert.strictEqual(r.nail, 148);            // top - wire drop
+});
+
+test("aboveFurniture: default gap is the ~7 inch rule", () => {
+  const r = H.aboveFurniture({ furnitureTop: 90, frameHeight: 40 });
+  assert.strictEqual(r.gap, H.FURNITURE_GAP_CM);
+});
+
+test("aboveFurniture: reports the art-width band from the furniture width", () => {
+  const r = H.aboveFurniture({ furnitureTop: 85, frameHeight: 50, furnitureWidth: 200 });
+  assert.ok(Math.abs(r.artWidthMin - 133.3) < 0.2); // two-thirds
+  assert.strictEqual(r.artWidthMax, 150);           // three-quarters
+});
+
+test("aboveFurniture: tells you how far above standing eye level it sits", () => {
+  const low = H.aboveFurniture({ furnitureTop: 50, frameHeight: 40 });
+  const high = H.aboveFurniture({ furnitureTop: 100, frameHeight: 40 });
+  assert.ok(high.aboveEyeLevel > low.aboveEyeLevel);
+});
+
+test("aboveFurniture returns null without the furniture and frame sizes", () => {
+  assert.strictEqual(H.aboveFurniture({ furnitureTop: 85 }), null);
+  assert.strictEqual(H.aboveFurniture({ frameHeight: 50 }), null);
+  assert.strictEqual(H.aboveFurniture({}), null);
+});
