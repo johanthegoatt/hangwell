@@ -87,6 +87,56 @@
     };
   }
 
+  // Hanging over a sofa, console or headboard. Here the eye-level rule gives
+  // way to the furniture: the picture is tied to the top of the piece below it,
+  // not to 145 cm. The design rule of thumb is a hand's span of wall showing
+  // between the furniture and the bottom of the frame — about 15-25 cm (6-10
+  // in), 18 cm by default — so the two read as one group rather than drifting
+  // apart. From the gap up, the nail height follows the same wire-drop sum.
+  //
+  // If the furniture width is given, it also reports the width the art should
+  // be to sit well over it: about two-thirds to three-quarters of the furniture
+  // (the common interior-design proportion), so a single frame or a group spans
+  // most of the piece without overhanging it.
+  var FURNITURE_GAP_CM = 18;   // ~7 in of wall between furniture and frame
+  function aboveFurniture(opts) {
+    opts = opts || {};
+    var furnitureTop = Math.max(0, Number(opts.furnitureTop) || 0);
+    var frameHeight = Math.max(0, Number(opts.frameHeight) || 0);
+    if (!(furnitureTop > 0) || !(frameHeight > 0)) return null;
+
+    var gap = Number(opts.gap);
+    if (!isFinite(gap) || gap < 0) gap = FURNITURE_GAP_CM;
+    var wireDrop = Number(opts.wireDrop);
+    if (!isFinite(wireDrop) || wireDrop < 0) wireDrop = WIRE_DROP_CM;
+
+    var bottom = furnitureTop + gap;
+    var top = bottom + frameHeight;
+    var centre = bottom + frameHeight / 2;
+    var nail = top - wireDrop;
+
+    var out = {
+      furnitureTop: round(furnitureTop, 1),
+      gap: round(gap, 1),
+      bottomOfFrame: round(bottom, 1),
+      topOfFrame: round(top, 1),
+      centre: round(centre, 1),
+      nail: round(nail, 1),
+      wireDrop: wireDrop,
+      // How much higher than standing eye level this ends up, so the person can
+      // sanity-check it against a picture hung on open wall.
+      aboveEyeLevel: round(centre - EYE_LEVEL_CM, 1)
+    };
+
+    var fw = Number(opts.furnitureWidth);
+    if (isFinite(fw) && fw > 0) {
+      out.furnitureWidth = round(fw, 1);
+      out.artWidthMin = round(fw * 2 / 3, 1);
+      out.artWidthMax = round(fw * 3 / 4, 1);
+    }
+    return out;
+  }
+
   // Spread a row of frames across a wall with equal gaps between them and equal
   // margins at each end. Frames keep their own widths; the gap is what you set.
   // Returns each frame's left edge, its centre across the wall, and the nail
@@ -210,6 +260,8 @@
     toCm: toCm,
     fromCm: fromCm,
     nailHeight: nailHeight,
+    aboveFurniture: aboveFurniture,
+    FURNITURE_GAP_CM: FURNITURE_GAP_CM,
     rowPlan: rowPlan,
     gapToFit: gapToFit,
     fixing: fixing
